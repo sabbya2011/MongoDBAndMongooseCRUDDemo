@@ -86,6 +86,36 @@ app.delete('/todos/:id',(req,res)=>{
     }
 });
 
+app.patch('.todos/:id',(req,res)=>{
+    const id = req.params.id;
+    if(!ObjectID.isValid(id)){
+        res.status(404).res("Todo not found");
+    }else{
+        const body = _.pick(req.body,["text","completed"]);
+
+        if(_.isBoolean(body.completed) && body.completed){
+            body.completedAt = new Date().getTime();
+        }else{
+            body.completed = false;
+        }
+        Todo.findByIdAndUpdate(id,{$set:body},{new:true})
+            .then(
+                (todos)=>{
+                    if(!todos){
+                        res.status(404).send("Todo not found");
+                    }else{
+                        res.send({todos});
+                    }
+                },
+                (err)=>{
+                    res.status(400).send(err);
+                }
+            ).catch(e=>{
+                res.status(400).send();
+            })
+    }
+})
+
 app.listen(3000,()=>{
     console.log("Express is listening");
 })
