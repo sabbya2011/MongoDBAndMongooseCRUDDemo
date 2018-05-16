@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const _ = require("lodash");
 const {ObjectID} = require("mongodb");
 
 const {mongoose} = require("./db/mongoose");
@@ -11,8 +12,6 @@ const app = express();
 app.use(bodyParser.json());
 
 app.post('/todos',(req,res)=>{
-    console.log(req.body);
-
     const newTodo = new Todo({
         text:req.body.text,
         completed:req.body.completed,
@@ -86,7 +85,7 @@ app.delete('/todos/:id',(req,res)=>{
     }
 });
 
-app.patch('.todos/:id',(req,res)=>{
+app.patch('/todos/:id',(req,res)=>{
     const id = req.params.id;
     if(!ObjectID.isValid(id)){
         res.status(404).res("Todo not found");
@@ -114,11 +113,11 @@ app.patch('.todos/:id',(req,res)=>{
                 res.status(400).send();
             })
     }
-})
+});
 
 app.listen(3000,()=>{
     console.log("Express is listening");
-})
+});
 
 
 // const newTodo = new Todo({
