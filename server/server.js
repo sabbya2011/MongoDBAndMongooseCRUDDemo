@@ -121,8 +121,8 @@ app.post('/users',(req,res)=>{
     var user = new User(body);
 
     user.save().then(
-        (user)=>{
-            res.send(user);
+        (userdata)=>{
+            return user.generateAuthToken();
         },
         (err)=>{
             res.status(400).send(err);
