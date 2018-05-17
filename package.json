@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start":"npm server/server",
+    "start": "npm server/server",
     "dev": "nodemon server/server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -16,7 +16,8 @@
     "express": "^4.16.3",
     "lodash": "^4.17.10",
     "mongodb": "^3.1.0-beta4",
-    "mongoose": "^5.1.1"
+    "mongoose": "^5.1.1",
+    "validator": "^10.2.0"
   },
   "devDependencies": {
     "nodemon": "^1.17.4"
