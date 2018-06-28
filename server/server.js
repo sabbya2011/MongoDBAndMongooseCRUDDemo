@@ -127,7 +127,17 @@ app.post('/users',(req,res)=>{
         (err)=>{
             res.status(400).send(err);
         }
-    );
+    ).then(
+        (token)=>{
+            console.log(token);
+            res.header("x-auth",token).send(user);
+        },
+        (err)=>{
+            res.status(400).send(err);
+        }
+    ).catch(e=>{
+        res.status(400).send(e);
+    });
 });
 
 app.listen(3000,()=>{

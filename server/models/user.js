@@ -10,8 +10,10 @@ const UserSchema = new mongoose.Schema({
         trim:true,
         unique:true,
         validate:{
-            validator:validator.isEmail,
-            message:"{value} id not valid email"
+            validator:(value)=>{
+                return validator.isEmail(value);
+            },
+            message:"{VALUE} is not valid email"
         }
     },
     password:{
@@ -36,10 +38,11 @@ UserSchema.methods.generateAuthToken = ()=>{
     const access = "auth";
     const token = jwt.sign({_id:user.id.toString(),access},'abc123').toString();
 
-    user.tokens.push({access,token});
-    //user.tokens.concat([{access,token}]);
+    //user.tokens.push({access,token});
+    user.tokens = user.tokens.concat([{access,token}]);
     return user.save().then(
-        (res)=>{
+        ()=>{
+            console.log("token is "+token);
             return token;
         }
     );
