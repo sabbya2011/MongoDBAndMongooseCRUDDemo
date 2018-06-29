@@ -129,7 +129,6 @@ app.post('/users',(req,res)=>{
         }
     ).then(
         (token)=>{
-            console.log(token);
             res.header("x-auth",token).send(user);
         },
         (err)=>{

@@ -33,19 +33,12 @@ const UserSchema = new mongoose.Schema({
     }]
 });
 
-UserSchema.methods.generateAuthToken = ()=>{
+UserSchema.methods.generateAuthToken = function(){
     const user = this;
     const access = "auth";
-    const token = jwt.sign({_id:user.id.toString(),access},'abc123').toString();
-
-    //user.tokens.push({access,token});
-    user.tokens = user.tokens.concat([{access,token}]);
-    return user.save().then(
-        ()=>{
-            console.log("token is "+token);
-            return token;
-        }
-    );
+    const token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString();
+    user.tokens.push({access, token});
+    return user.save().then(()=>token);
 }
 
 const User = mongoose.model("User",UserSchema);
