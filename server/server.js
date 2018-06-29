@@ -13,11 +13,12 @@ const app = express();
 
 app.use(bodyParser.json());
 
-app.post('/todos',(req,res)=>{
+app.post('/todos',authenticateUser,(req,res)=>{
     const newTodo = new Todo({
         text:req.body.text,
         completed:req.body.completed,
-        completedAt:req.body.completedAt
+        completedAt:req.body.completedAt,
+        _creator:req.user._id
     });
     newTodo.save().then(
         (docs)=>{
@@ -29,38 +30,40 @@ app.post('/todos',(req,res)=>{
     );
 });
 
-app.get('/todos',(req,res)=>{
-    Todo.find()
-        .then(
-            (todos)=>{
-                res.send({todos});
-            },
-            (err)=>{
-                res.status(400).send(err);
-            }
-        )
+app.get('/todos',authenticateUser,(req,res)=>{
+    Todo.find({
+        _creator:req.user._id
+    }).then((todos)=>{
+        res.send({todos});
+    },
+    (err)=>{
+        res.status(400).send(err);
+    })
 });
 
-app.get('/todos/:id',(req,res)=>{
+app.get('/todos/:id',authenticateUser,(req,res)=>{
     const id = req.params.id;
     if(!ObjectID.isValid(id)){
         res.status(404).send("Todo not found");
     }else{
-        Todo.findById(id)
-            .then(
-                (todos)=>{
-                    if(!todos){
-                        res.status(404).send("Todo not found");
-                    }else{
-                        res.send({todos});
-                    }
-                },
-                (err)=>{
-                    res.status(400).send(err);
+        Todo.findOne({
+            _id:id,
+            _creator:req.user._id
+        })
+        .then(
+            (todos)=>{
+                if(!todos){
+                    res.status(404).send("Todo not found");
+                }else{
+                    res.send({todos});
                 }
-            ).catch(e=>{
-                res.status(400).send();
-            })
+            },
+            (err)=>{
+                res.status(400).send(err);
+            }
+        ).catch(e=>{
+            res.status(400).send();
+        })
     }
 });
 
@@ -69,7 +72,7 @@ app.delete('/todos/:id',(req,res)=>{
     if(!ObjectID.isValid(id)){
         res.status(404).send("Todo not found");
     }else{
-        Todo.findByIdAndRemove(id)
+        Todo.findOneAndRemove({_id:id,creator:req.user._id})
             .then(
                 (todos)=>{
                     if(!todos){
@@ -99,7 +102,7 @@ app.patch('/todos/:id',(req,res)=>{
         }else{
             body.completed = false;
         }
-        Todo.findByIdAndUpdate(id,{$set:body},{new:true})
+        Todo.findOneAndUpdate({_id:id,creator:req.user._id},{$set:body},{new:true})
             .then(
                 (todos)=>{
                     if(!todos){
